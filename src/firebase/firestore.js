@@ -77,3 +77,32 @@ export const checkIfAdmin = async (uid) => {
   const docSnap = await getDoc(adminRef);
   return docSnap.exists();
 };
+// ========== Exam Types ==========
+export const getExamTypes = async () => {
+  const snap = await getDocs(collection(db, 'examTypes'));
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+};
+
+export const addExamType = async (data) => {
+  return await addDoc(collection(db, 'examTypes'), data);
+};
+
+// ========== Bundles ==========
+export const getBundles = async () => {
+  const snap = await getDocs(collection(db, 'bundles'));
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+};
+
+export const addBundle = async (data) => {
+  return await addDoc(collection(db, 'bundles'), data);
+};
+
+export const updateBundle = async (id, data) => {
+  const ref = doc(db, 'bundles', id);
+  return await updateDoc(ref, data);
+};
+
+export const deleteBundle = async (id) => {
+  const ref = doc(db, 'bundles', id);
+  return await deleteDoc(ref);
+};

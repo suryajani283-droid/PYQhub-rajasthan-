@@ -1,12 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  loginWithEmail,
-  registerWithEmail,
-  loginWithGoogle,
-  getGoogleRedirectResult,
-  logoutUser,
-} from '../firebase/auth';
+import { loginWithEmail, registerWithEmail, loginWithGoogle, logoutUser } from '../firebase/auth';
 import { useAuth } from '../context/AuthContext';
 import { Helmet } from 'react-helmet-async';
 
@@ -20,14 +14,6 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    getGoogleRedirectResult()
-      .then((result) => {
-        if (result) navigate('/dashboard');
-      })
-      .catch((err) => setError(err.message));
-  }, [navigate]);
 
   if (user) {
     return (
@@ -69,10 +55,14 @@ export default function LoginPage() {
 
   const handleGoogle = async () => {
     setError('');
+    setLoading(true);
     try {
-      await loginWithGoogle();
+      await loginWithGoogle();  // popup will open
+      navigate('/dashboard');
     } catch (err) {
       setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 

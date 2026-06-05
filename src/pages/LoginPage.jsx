@@ -21,7 +21,6 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Google Redirect result handle
   useEffect(() => {
     getGoogleRedirectResult()
       .then((result) => {
@@ -30,7 +29,6 @@ export default function LoginPage() {
       .catch((err) => setError(err.message));
   }, [navigate]);
 
-  // Already logged-in view
   if (user) {
     return (
       <div className="min-h-[70vh] flex items-center justify-center px-4">
@@ -72,7 +70,7 @@ export default function LoginPage() {
   const handleGoogle = async () => {
     setError('');
     try {
-      await loginWithGoogle(); // Redirect happens here
+      await loginWithGoogle();
     } catch (err) {
       setError(err.message);
     }

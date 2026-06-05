@@ -8,6 +8,7 @@ import DashboardPage from './pages/DashboardPage';
 import AdminPage from './pages/AdminPage';
 import Header from './components/common/Header';
 import Footer from './components/common/Footer';
+import AdminRoute from './components/common/AdminRoute';
 
 function App() {
   return (

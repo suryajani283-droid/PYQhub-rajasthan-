@@ -11,5 +11,18 @@
 <body>
   <noscript>You need to enable JavaScript to run this app.</noscript>
   <div id="root"></div>
+
+  <!-- Temporary Error Debugger -->
+  <script>
+    window.onerror = function(message, source, lineno, colno, error) {
+      document.body.innerHTML = '<div style="background:red; color:white; padding:20px; font-family:monospace;">' +
+        '<h2>🔥 ERROR:</h2>' +
+        '<p><b>Message:</b> ' + message + '</p>' +
+        '<p><b>Source:</b> ' + source + '</p>' +
+        '<p><b>Line:</b> ' + lineno + ', Col: ' + colno + '</p>' +
+        (error && error.stack ? '<pre>' + error.stack + '</pre>' : '') +
+        '</div>';
+    };
+  </script>
 </body>
 </html>

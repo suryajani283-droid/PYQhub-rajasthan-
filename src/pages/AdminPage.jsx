@@ -6,7 +6,7 @@ import AdminDashboard from '../components/admin/AdminDashboard';
 import PaperManager from '../components/admin/PaperManager';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 
-const ADMIN_EMAIL = 'your-admin-email@gmail.com'; // अपनी ईमेल डालें
+const ADMIN_EMAIL = 'suryajani283@gmail.com'; // अपनी ईमेल डालें
 
 export default function AdminPage() {
   const { user, loading } = useAuth();

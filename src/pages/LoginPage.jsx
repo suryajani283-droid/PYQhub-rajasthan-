@@ -1,6 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { loginWithEmail, registerWithEmail, sendMagicLink, checkEmailLink, completeEmailSignIn, logoutUser } from '../firebase/auth';
+import {
+  loginWithEmail,
+  registerWithEmail,
+  sendMagicLink,
+  checkEmailLink,
+  completeEmailSignIn,
+  logoutUser,
+} from '../firebase/auth';
+import { checkIfAdmin } from '../firebase/firestore';  // ✅ एडमिन चेक इम्पोर्ट
 import { useAuth } from '../context/AuthContext';
 import { Helmet } from 'react-helmet-async';
 
@@ -17,13 +25,19 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [magicLinkSent, setMagicLinkSent] = useState(false);
 
-  // Magic link se aaye hain to login karein
+  // Magic link से आने पर एडमिन चेक करके रीडायरेक्ट
   useEffect(() => {
     const handleEmailLink = async () => {
       if (checkEmailLink()) {
         try {
-          await completeEmailSignIn();
-          navigate('/dashboard');
+          const result = await completeEmailSignIn(); // result में user होता है
+          const uid = result.user.uid;
+          const isAdmin = await checkIfAdmin(uid);
+          if (isAdmin) {
+            navigate('/admin');
+          } else {
+            navigate('/dashboard');
+          }
         } catch (err) {
           setError(err.message);
         }
@@ -59,12 +73,20 @@ export default function LoginPage() {
     setError('');
     setLoading(true);
     try {
+      let userCredential;
       if (isRegister) {
-        await registerWithEmail(name, email, password);
+        userCredential = await registerWithEmail(name, email, password);
       } else {
-        await loginWithEmail(email, password);
+        userCredential = await loginWithEmail(email, password);
       }
-      navigate('/dashboard');
+      // ✅ एडमिन चेक और रीडायरेक्ट
+      const uid = userCredential.user.uid;
+      const isAdmin = await checkIfAdmin(uid);
+      if (isAdmin) {
+        navigate('/admin');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err) {
       setError(err.message);
     } finally {

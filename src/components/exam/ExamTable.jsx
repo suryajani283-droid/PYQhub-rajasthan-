@@ -1,8 +1,4 @@
-import { useAuth } from '../../context/AuthContext';
-
 export default function ExamTable({ papers, onBuy }) {
-  const { user } = useAuth();
-
   return (
     <div className="overflow-x-auto">
       <table className="w-full bg-white rounded-lg shadow">
@@ -34,4 +30,4 @@ export default function ExamTable({ papers, onBuy }) {
       </table>
     </div>
   );
-} 
+}

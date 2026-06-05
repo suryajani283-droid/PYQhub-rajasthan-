@@ -1,6 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { loginWithEmail, registerWithEmail, loginWithGoogle, getGoogleRedirectResult, logoutUser } from '../firebase/auth';
+import {
+  loginWithEmail,
+  registerWithEmail,
+  loginWithGoogle,
+  getGoogleRedirectResult,
+  logoutUser,
+} from '../firebase/auth';
 import { useAuth } from '../context/AuthContext';
 import { Helmet } from 'react-helmet-async';
 
@@ -15,20 +21,16 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // Google Redirect result handle
   useEffect(() => {
-    const handleRedirect = async () => {
-      try {
-        const result = await getGoogleRedirectResult();
-        if (result) {
-          navigate('/dashboard');
-        }
-      } catch (err) {
-        setError(err.message);
-      }
-    };
-    handleRedirect();
+    getGoogleRedirectResult()
+      .then((result) => {
+        if (result) navigate('/dashboard');
+      })
+      .catch((err) => setError(err.message));
   }, [navigate]);
 
+  // Already logged-in view
   if (user) {
     return (
       <div className="min-h-[70vh] flex items-center justify-center px-4">
@@ -70,8 +72,7 @@ export default function LoginPage() {
   const handleGoogle = async () => {
     setError('');
     try {
-      await loginWithGoogle();
-      // No navigation here; redirect will happen, and useEffect will handle result
+      await loginWithGoogle(); // Redirect happens here
     } catch (err) {
       setError(err.message);
     }

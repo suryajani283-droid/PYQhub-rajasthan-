@@ -4,18 +4,17 @@ import LoadingSpinner from './LoadingSpinner';
 
 export default function AdminRoute({ children }) {
   const { user, loading: authLoading } = useAuth();
-  
-  // Temporary: allow only this email
-  const ADMIN_EMAIL = 'raju@gmail.com';
+  const ADMIN_EMAIL = process.env.REACT_APP_ADMIN_EMAIL;
 
   if (authLoading) return <LoadingSpinner />;
   if (!user) return <Navigate to="/" />;
-  
+
   if (user.email !== ADMIN_EMAIL) {
     return (
-      <div style={{ padding: 20 }}>
+      <div style={{ padding: 20, background: 'white', color: 'black' }}>
         <h2>🚫 Access Denied</h2>
-        <p>You are not admin.</p>
+        <p>You are not authorized to view this page.</p>
+        <button onClick={() => window.location.href = '/'}>Go Home</button>
       </div>
     );
   }

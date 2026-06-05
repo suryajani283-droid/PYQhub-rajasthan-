@@ -8,7 +8,7 @@ import {
   completeEmailSignIn,
   logoutUser,
 } from '../firebase/auth';
-import { checkIfAdmin } from '../firebase/firestore';  // ✅ एडमिन चेक इम्पोर्ट
+import { checkIfAdmin } from '../firebase/firestore';
 import { useAuth } from '../context/AuthContext';
 import { Helmet } from 'react-helmet-async';
 
@@ -24,20 +24,34 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [magicLinkSent, setMagicLinkSent] = useState(false);
+  const [adminChecked, setAdminChecked] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
-  // Magic link से आने पर एडमिन चेक करके रीडायरेक्ट
+  // पहले से लॉगिन यूज़र के लिए – एडमिन चेक करके रीडायरेक्ट करें या बटन दिखाएँ
+  useEffect(() => {
+    if (user && !adminChecked) {
+      checkIfAdmin(user.uid)
+        .then((admin) => {
+          setIsAdmin(admin);
+          setAdminChecked(true);
+          if (admin) {
+            // एडमिन है तो सीधे एडमिन पैनल पर भेजें
+            navigate('/admin', { replace: true });
+          }
+        })
+        .catch(() => setAdminChecked(true));
+    }
+  }, [user, adminChecked, navigate]);
+
+  // Magic link से आने पर
   useEffect(() => {
     const handleEmailLink = async () => {
       if (checkEmailLink()) {
         try {
-          const result = await completeEmailSignIn(); // result में user होता है
+          const result = await completeEmailSignIn();
           const uid = result.user.uid;
-          const isAdmin = await checkIfAdmin(uid);
-          if (isAdmin) {
-            navigate('/admin');
-          } else {
-            navigate('/dashboard');
-          }
+          const admin = await checkIfAdmin(uid);
+          navigate(admin ? '/admin' : '/dashboard', { replace: true });
         } catch (err) {
           setError(err.message);
         }
@@ -48,7 +62,8 @@ export default function LoginPage() {
     handleEmailLink();
   }, [navigate, searchParams]);
 
-  if (user) {
+  // Already logged in (non‑admin) view with admin button
+  if (user && adminChecked && !isAdmin) {
     return (
       <div className="min-h-[70vh] flex items-center justify-center px-4">
         <Helmet><title>Already Logged In - PYQHub Rajasthan</title></Helmet>
@@ -59,11 +74,21 @@ export default function LoginPage() {
             <button onClick={() => navigate('/dashboard')} className="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700">
               Go to Dashboard
             </button>
+            {/* Admin होने पर यह बटन भी दिखाएँ – ऊपर वाला ब्लॉक सिर्फ non‑admin के लिए है, लेकिन फिर भी सुरक्षा के लिए */}
             <button onClick={async () => { await logoutUser(); navigate('/login'); }} className="w-full bg-gray-100 text-gray-700 py-3 rounded-xl font-semibold hover:bg-gray-200">
               Logout & Sign In Again
             </button>
           </div>
         </div>
+      </div>
+    );
+  }
+
+  // अगर एडमिन रीडायरेक्ट हो रहा है तो लोडिंग दिखाएँ
+  if (user && !adminChecked) {
+    return (
+      <div className="min-h-[70vh] flex items-center justify-center">
+        <p>Checking permissions...</p>
       </div>
     );
   }
@@ -79,14 +104,9 @@ export default function LoginPage() {
       } else {
         userCredential = await loginWithEmail(email, password);
       }
-      // ✅ एडमिन चेक और रीडायरेक्ट
       const uid = userCredential.user.uid;
-      const isAdmin = await checkIfAdmin(uid);
-      if (isAdmin) {
-        navigate('/admin');
-      } else {
-        navigate('/dashboard');
-      }
+      const admin = await checkIfAdmin(uid);
+      navigate(admin ? '/admin' : '/dashboard', { replace: true });
     } catch (err) {
       setError(err.message);
     } finally {

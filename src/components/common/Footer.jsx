@@ -5,10 +5,16 @@ export default function Footer() {
         © {new Date().getFullYear()} PYQHub Rajasthan. All rights reserved.
       </p>
       <div className="flex justify-center gap-4 mt-2">
-        <a href="#" className="hover:text-blue-300">Privacy Policy</a>
-        <a href="#" className="hover:text-blue-300">Terms</a>
-        <a href="#" className="hover:text-blue-300">Contact</a>
+        <button className="hover:text-blue-300 bg-transparent border-none text-white cursor-pointer">
+          Privacy Policy
+        </button>
+        <button className="hover:text-blue-300 bg-transparent border-none text-white cursor-pointer">
+          Terms
+        </button>
+        <button className="hover:text-blue-300 bg-transparent border-none text-white cursor-pointer">
+          Contact
+        </button>
       </div>
     </footer>
   );
-} 
+}

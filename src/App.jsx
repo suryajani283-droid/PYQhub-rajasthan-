@@ -5,7 +5,7 @@ import LoginPage from './pages/LoginPage';
 import ExamPage from './pages/ExamPage';
 import DashboardPage from './pages/DashboardPage';
 import AdminPage from './pages/AdminPage';
-import NotFound from './pages/NotFound';
+
 import Header from './components/common/Header';
 import Footer from './components/common/Footer';
 

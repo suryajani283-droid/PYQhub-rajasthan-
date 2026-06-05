@@ -21,7 +21,11 @@ function App() {
               <Route path="/login" element={<LoginPage />} />
               <Route path="/exam/:examId" element={<ExamPage />} />
               <Route path="/dashboard" element={<DashboardPage />} />
-              <Route path="/admin" element={<AdminPage />} />
+              <Route path="/admin" element={
+  <AdminRoute>
+    <AdminPage />
+  </AdminRoute>
+} />
               <Route path="*" element={<div className="text-center py-20"><h1>404</h1><p>Page not found</p></div>} />
             </Routes>
           </main>

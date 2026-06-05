@@ -4,12 +4,12 @@ import { Navigate } from 'react-router-dom';
 import { getAllPapers, getAllPurchases } from '../firebase/firestore';
 import AdminDashboard from '../components/admin/AdminDashboard';
 import PaperManager from '../components/admin/PaperManager';
+import ExamTypeManager from '../components/admin/ExamTypeManager';  // नया
+import BundleManager from '../components/admin/BundleManager';      // नया
 import LoadingSpinner from '../components/common/LoadingSpinner';
 
 export default function AdminPage() {
   const { user, loading: authLoading } = useAuth();
-
-  // ✅ Cloudflare Pages या .env से ईमेल लें
   const ADMIN_EMAIL = process.env.REACT_APP_ADMIN_EMAIL;
 
   const [papers, setPapers] = useState([]);
@@ -51,7 +51,10 @@ export default function AdminPage() {
         todayRevenue={todayRevenue}
         monthlyRevenue={monthRevenue}
       />
-      <div className="grid md:grid-cols-2 gap-8">
+      {/* नया एग्जाम टाइप मैनेजर */}
+      <ExamTypeManager />
+
+      <div className="grid md:grid-cols-2 gap-8 mt-6">
         <PaperManager papers={papers} refreshPapers={fetchData} />
         <div>
           <h2 className="text-xl font-semibold mb-4">Recent Purchases</h2>
@@ -69,6 +72,9 @@ export default function AdminPage() {
           )}
         </div>
       </div>
+
+      {/* बंडल मैनेजर */}
+      <BundleManager />
     </div>
   );
 }

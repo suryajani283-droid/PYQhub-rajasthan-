@@ -57,10 +57,14 @@ export default function LoginPage() {
     setError('');
     setLoading(true);
     try {
-      await loginWithGoogle();  // popup will open
-      navigate('/dashboard');
+      const result = await loginWithGoogle(); // popup opens
+      if (result) navigate('/dashboard');
     } catch (err) {
-      setError(err.message);
+      if (err.code === 'auth/popup-blocked') {
+        setError('Popup was blocked. Please allow popups for this site.');
+      } else {
+        setError(err.message);
+      }
     } finally {
       setLoading(false);
     }

@@ -1,14 +1,22 @@
-import { useState } from 'react';
-import { addPaper, updatePaper, deletePaper } from '../../firebase/firestore';
+import { useState, useEffect } from 'react';
+import { addPaper, updatePaper, deletePaper, getExamTypes } from '../../firebase/firestore';
 import { uploadPDF } from '../../firebase/storage';
 
 export default function PaperManager({ papers, refreshPapers }) {
-  const [exam, setExam] = useState('RAS');
+  const [examTypes, setExamTypes] = useState([]);
+  const [exam, setExam] = useState('');
   const [year, setYear] = useState('');
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [file, setFile] = useState(null);
   const [editingId, setEditingId] = useState(null);
+
+  useEffect(() => {
+    getExamTypes().then(list => {
+      setExamTypes(list);
+      if (list.length > 0 && !exam) setExam(list[0].slug);
+    });
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -34,7 +42,7 @@ export default function PaperManager({ papers, refreshPapers }) {
       }
       alert('Paper saved!');
       refreshPapers();
-      setExam('RAS'); setYear(''); setName(''); setPrice(''); setFile(null);
+      setYear(''); setName(''); setPrice(''); setFile(null);
     } catch (err) {
       alert('Error: ' + err.message);
     }
@@ -61,7 +69,18 @@ export default function PaperManager({ papers, refreshPapers }) {
         {editingId ? 'Edit Paper' : 'Add New Paper'}
       </h2>
       <form onSubmit={handleSubmit} className="space-y-3">
-        <input type="text" placeholder="Exam Code (e.g. RAS)" value={exam} onChange={e => setExam(e.target.value)} className="w-full p-2 border rounded" required />
+        {/* Exam Dropdown */}
+        <select
+          value={exam}
+          onChange={(e) => setExam(e.target.value)}
+          className="w-full p-2 border rounded"
+          required
+        >
+          {examTypes.map(et => (
+            <option key={et.slug} value={et.slug}>{et.icon} {et.name}</option>
+          ))}
+        </select>
+
         <input type="number" placeholder="Year" value={year} onChange={e => setYear(e.target.value)} className="w-full p-2 border rounded" required />
         <input type="text" placeholder="Paper Name" value={name} onChange={e => setName(e.target.value)} className="w-full p-2 border rounded" required />
         <input type="number" placeholder="Price (₹)" value={price} onChange={e => setPrice(e.target.value)} className="w-full p-2 border rounded" required />
@@ -98,4 +117,4 @@ export default function PaperManager({ papers, refreshPapers }) {
       </div>
     </div>
   );
-} 
+}

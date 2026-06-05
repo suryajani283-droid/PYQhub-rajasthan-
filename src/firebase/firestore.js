@@ -69,3 +69,10 @@ export const getAllPurchases = async () => {
   const snap = await getDocs(collection(db, 'purchases'));
   return snap.docs.map(d => ({ id: d.id, ...d.data() }));
 }; 
+
+// Check if a user is admin (by UID)
+export const checkIfAdmin = async (uid) => {
+  const adminRef = doc(db, 'admins', uid);
+  const docSnap = await getDoc(adminRef);
+  return docSnap.exists();
+};

@@ -5,7 +5,7 @@ import { getStorage } from 'firebase/storage';
 
 const firebaseConfig = {
   apiKey: "AIzaSyD1R1dOYjhr9SY4saZihXr5YpIFWr0Dut8",
-  authDomain: "pyqhub-rajasthan.firebaseapp.com",
+  authDomain: "https://pyqhubrajasthan.suryajani28.workers.dev",
   projectId: "pyqhub-rajasthan",
   storageBucket: "pyqhub-rajasthan.firebasestorage.app",
   messagingSenderId: "92908580623",

@@ -4,8 +4,8 @@ import { Navigate } from 'react-router-dom';
 import { getAllPapers, getAllPurchases } from '../firebase/firestore';
 import AdminDashboard from '../components/admin/AdminDashboard';
 import PaperManager from '../components/admin/PaperManager';
-import ExamTypeManager from '../components/admin/ExamTypeManager';  // नया
-import BundleManager from '../components/admin/BundleManager';      // नया
+import ExamTypeManager from '../components/admin/ExamTypeManager';
+import BundleManager from '../components/admin/BundleManager';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 
 export default function AdminPage() {
@@ -44,17 +44,14 @@ export default function AdminPage() {
   }).reduce((s, p) => s + (p.amount || 0), 0);
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-6">Admin Panel</h1>
-      <AdminDashboard
-        totalRevenue={totalRevenue}
-        todayRevenue={todayRevenue}
-        monthlyRevenue={monthRevenue}
-      />
-      {/* नया एग्जाम टाइप मैनेजर */}
+    <div className="space-y-8">
+      <h1 className="text-3xl font-bold">Admin Panel</h1>
+      <AdminDashboard totalRevenue={totalRevenue} todayRevenue={todayRevenue} monthlyRevenue={monthRevenue} />
+
+      {/* Exam Type Manager */}
       <ExamTypeManager />
 
-      <div className="grid md:grid-cols-2 gap-8 mt-6">
+      <div className="grid md:grid-cols-2 gap-8">
         <PaperManager papers={papers} refreshPapers={fetchData} />
         <div>
           <h2 className="text-xl font-semibold mb-4">Recent Purchases</h2>
@@ -73,7 +70,7 @@ export default function AdminPage() {
         </div>
       </div>
 
-      {/* बंडल मैनेजर */}
+      {/* Bundle Manager */}
       <BundleManager />
     </div>
   );

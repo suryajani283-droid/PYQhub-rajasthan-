@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { addPaper, updatePaper, deletePaper, getExamTypes } from '../../firebase/firestore';
-import { uploadPDF } from '../../firebase/storage';
 
 export default function PaperManager({ papers, refreshPapers }) {
   const [examTypes, setExamTypes] = useState([]);
@@ -8,7 +7,8 @@ export default function PaperManager({ papers, refreshPapers }) {
   const [year, setYear] = useState('');
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
-  const [file, setFile] = useState(null);
+  const [downloadURL, setDownloadURL] = useState('');  // Google Drive Direct Download Link
+  const [isFree, setIsFree] = useState(false);
   const [editingId, setEditingId] = useState(null);
 
   useEffect(() => {
@@ -20,19 +20,15 @@ export default function PaperManager({ papers, refreshPapers }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!file && !editingId) return alert('Select PDF file');
+    if (!downloadURL) return alert('Please paste Google Drive download link');
     try {
-      let url = editingId ? papers.find(p => p.id === editingId)?.downloadURL : '';
-      if (file) {
-        url = await uploadPDF(file, `papers/${exam}_${year}.pdf`);
-      }
       const paperData = {
         exam: exam.toUpperCase(),
         year: parseInt(year),
         name,
         price: parseInt(price),
-        downloadURL: url,
-        isFree: false,
+        downloadURL,
+        isFree,
       };
       if (editingId) {
         await updatePaper(editingId, paperData);
@@ -42,7 +38,7 @@ export default function PaperManager({ papers, refreshPapers }) {
       }
       alert('Paper saved!');
       refreshPapers();
-      setYear(''); setName(''); setPrice(''); setFile(null);
+      setYear(''); setName(''); setPrice(''); setDownloadURL(''); setIsFree(false);
     } catch (err) {
       alert('Error: ' + err.message);
     }
@@ -53,6 +49,8 @@ export default function PaperManager({ papers, refreshPapers }) {
     setYear(paper.year.toString());
     setName(paper.name);
     setPrice(paper.price.toString());
+    setDownloadURL(paper.downloadURL || '');
+    setIsFree(paper.isFree || false);
     setEditingId(paper.id);
   };
 
@@ -70,12 +68,7 @@ export default function PaperManager({ papers, refreshPapers }) {
       </h2>
       <form onSubmit={handleSubmit} className="space-y-3">
         {/* Exam Dropdown */}
-        <select
-          value={exam}
-          onChange={(e) => setExam(e.target.value)}
-          className="w-full p-2 border rounded"
-          required
-        >
+        <select value={exam} onChange={(e) => setExam(e.target.value)} className="w-full p-2 border rounded" required>
           {examTypes.map(et => (
             <option key={et.slug} value={et.slug}>{et.icon} {et.name}</option>
           ))}
@@ -84,7 +77,15 @@ export default function PaperManager({ papers, refreshPapers }) {
         <input type="number" placeholder="Year" value={year} onChange={e => setYear(e.target.value)} className="w-full p-2 border rounded" required />
         <input type="text" placeholder="Paper Name" value={name} onChange={e => setName(e.target.value)} className="w-full p-2 border rounded" required />
         <input type="number" placeholder="Price (₹)" value={price} onChange={e => setPrice(e.target.value)} className="w-full p-2 border rounded" required />
-        <input type="file" accept="application/pdf" onChange={e => setFile(e.target.files[0])} className="w-full" />
+
+        {/* Google Drive Link Input */}
+        <input type="url" placeholder="Google Drive Direct Download Link (https://drive.google.com/uc?export=download&id=...)" value={downloadURL} onChange={e => setDownloadURL(e.target.value)} className="w-full p-2 border rounded" required />
+
+        <label className="flex items-center gap-2">
+          <input type="checkbox" checked={isFree} onChange={e => setIsFree(e.target.checked)} />
+          <span className="text-sm">Free Paper</span>
+        </label>
+
         <div className="flex gap-2">
           <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
             {editingId ? 'Update' : 'Upload'}
@@ -105,7 +106,7 @@ export default function PaperManager({ papers, refreshPapers }) {
           <ul className="space-y-2">
             {papers.map(paper => (
               <li key={paper.id} className="flex justify-between items-center bg-gray-50 p-2 rounded">
-                <span>{paper.exam} {paper.year} - {paper.name} (₹{paper.price})</span>
+                <span>{paper.exam} {paper.year} - {paper.name} (₹{paper.price}) {paper.isFree ? '(Free)' : ''}</span>
                 <div className="flex gap-2">
                   <button onClick={() => handleEdit(paper)} className="text-blue-600 hover:underline text-sm">Edit</button>
                   <button onClick={() => handleDelete(paper.id)} className="text-red-600 hover:underline text-sm">Delete</button>

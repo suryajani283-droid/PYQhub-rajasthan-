@@ -86,6 +86,11 @@ export const getExamTypes = async () => {
 export const addExamType = async (data) => {
   return await addDoc(collection(db, 'examTypes'), data);
 };
+// Delete an exam type
+export const deleteExamType = async (id) => {
+  const ref = doc(db, 'examTypes', id);
+  return await deleteDoc(ref);
+};
 
 // ========== Bundles ==========
 export const getBundles = async () => {
